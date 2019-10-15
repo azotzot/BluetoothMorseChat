@@ -3,11 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/createChat"
+        android:id="@+id/connectTo"
         android:enabled="true"
-        android:icon="@android:drawable/stat_sys_data_bluetooth"
+        android:icon="@android:drawable/ic_menu_search"
         android:title="connect"
         android:visible="true"
-        app:showAsAction="always">
+        app:showAsAction="always"></item>
+
+    <item
+        android:id="@+id/listenConnect"
+        android:enabled="true"
+        android:icon="@android:drawable/stat_sys_data_bluetooth"
+        android:title="Connect listen"
+        android:visible="true"
+        app:showAsAction="ifRoom">
     </item>
 </menu>
