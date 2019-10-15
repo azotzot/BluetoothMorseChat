@@ -1,49 +1,36 @@
 package azotzot.bluetoothmorsechat
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothServerSocket
-import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
-
     private val TAG = "MainActivity"
 
-    private val NAME_SECURE = "ChatService"
-
-
-    private val setDevices = mutableSetOf<BluetoothDevice>()
-    
-
     private lateinit var pairedDevices: MutableList<BluetoothDevice>
-    private lateinit var serverSocket: BluetoothServerSocket
-    private lateinit var clientSocket: BluetoothSocket
-    private lateinit var chatService: ChatService
+    private lateinit var bluetoothAdapter: BluetoothAdapter
 
     private val REQUEST_ENABLE_BT = 0
 
-    private lateinit var bluetoothAdapter: BluetoothAdapter
+    private val COMMAND_LISTEN = 1
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        startService(Intent(this, ChatService::class.java))
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (!bluetoothAdapter.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
-        }
+//        if (!bluetoothAdapter.isEnabled) {
+//            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+//        }
 
         pairedDevices = bluetoothAdapter.bondedDevices.toMutableList()
 
@@ -55,24 +42,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onStart() {
-        super.onStart()
 
-
-//        var pairsDevicesString = ""
-
-//        pairedDevices.forEach {
-//            pairsDevicesString += "Name: ${it.name} Address: ${it.address} \n"
-//        }
-//        pairsDevices.text = pairsDevicesString
-
-
+    fun send() {
+        Toast.makeText(this, "Send message", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-//        stopService(Intent(this, ChatService::class.java))
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.action_connect, menu)
@@ -82,24 +56,22 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
         when(item?.itemId) {
-            R.id.createChat -> {
-                val chosenDialog = NewChatFragment()
+            R.id.connectTo -> {
+                val chosenDialog = NewChatDialogFragment(pairedDevices)
                 chosenDialog.show(supportFragmentManager,"newChatDialog")
-//                true
+            }
+            R.id.listenConnect -> {
+                startService(Intent(this, ChatService::class.java).putExtra("commant", COMMAND_LISTEN))
+                Toast.makeText(this, "Wait connection...", Toast.LENGTH_SHORT).show()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    fun send() {
-        Toast.makeText(this, "Send message", Toast.LENGTH_SHORT).show()
-    }
+    override fun onDestroy() {
+        super.onDestroy()
 
+        stopService(Intent(this, ChatService::class.java))
 
-    class NewChatFragment: DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            return AlertDialog.Builder(activity).setTitle("Choose device")
-                    .setView(R.layout.choose_devices_dialog).create()
-        }
     }
 }
