@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BluetoothMorseChat</string>
+    <string name="message_hint">message</string>
+    <string name="just_send">send</string>
 </resources>

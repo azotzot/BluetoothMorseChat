@@ -28,9 +28,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="message"
+            android:hint="@string/message_hint"
             android:inputType="textLongMessage|textMultiLine|textPersonName"
-            android:paddingLeft="8dp" />
+            android:paddingLeft="8dp"
+            android:importantForAutofill="no" />
 
         <Button
             android:id="@+id/sendButton"
@@ -38,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0"
-            android:text="send" />
+            android:text="@string/just_send" />
     </LinearLayout>
 
 </LinearLayout>
