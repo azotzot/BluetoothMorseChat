@@ -21,6 +21,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#815B5666"
         android:orientation="horizontal"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="538dp">
@@ -35,8 +36,10 @@
                 android:id="@+id/morseString"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_back"
                 android:paddingLeft="8dp"
-                android:text="TextView" />
+                android:text="morse code"
+                android:textSize="12sp" />
 
             <EditText
                 android:id="@+id/editMessage"

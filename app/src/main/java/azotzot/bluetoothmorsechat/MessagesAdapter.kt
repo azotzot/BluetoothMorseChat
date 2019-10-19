@@ -9,10 +9,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.message_item.view.*
 
-class MessagesAdapter(private val messages: MutableList<Messages>, private val context: Context) : RecyclerView.Adapter<MessagesAdapter.MessagesViewHolder>() {
+class MessagesAdapter(private val messages: MutableList<Message>, private val context: Context) : RecyclerView.Adapter<MessagesAdapter.MessagesViewHolder>() {
 
     init {
-        Log.d("Messages", "adapter create")
+        Log.d("Message", "adapter create")
     }
     private val TAG = "MessagesAdapter"
 
@@ -24,7 +24,8 @@ class MessagesAdapter(private val messages: MutableList<Messages>, private val c
 
     override fun onBindViewHolder(holder: MessagesViewHolder, position: Int) {
         Log.d(TAG, "$messages")
-        holder.text.text = messages[position].text
+        holder.content.text = messages[position].content
+        holder.mesSender.text = messages[position].mesSender
     }
 
     override fun getItemCount() = messages.size
@@ -35,7 +36,8 @@ class MessagesAdapter(private val messages: MutableList<Messages>, private val c
     ): RecyclerView.ViewHolder(itemView) {
         private val TAG = "MessagesViewHolder"
 
-        var text: TextView = itemView.text
+        var content: TextView = itemView.content
+        var mesSender: TextView = itemView.mesSender
 
         init {
 

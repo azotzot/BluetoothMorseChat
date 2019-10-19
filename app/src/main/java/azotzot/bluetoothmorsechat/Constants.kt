@@ -11,5 +11,6 @@ class Constants {
 
         const val SEND_MESSAGE = 6
         const val MESSAGE_TOAST = 7
+        const val CONNECT_FAIL = 8
     }
 }

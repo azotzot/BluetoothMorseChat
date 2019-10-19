@@ -3,12 +3,9 @@ package azotzot.bluetoothmorsechat
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.ComponentName
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Message
 import android.util.Log
 import android.view.*
@@ -16,9 +13,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import azotzot.bluetoothmorsechat.Constants.Companion.CHANGE_UI
-import azotzot.bluetoothmorsechat.Constants.Companion.COMMAND_LISTEN
+import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_READ
 import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_TOAST
+import azotzot.bluetoothmorsechat.Constants.Companion.REQUEST_ENABLE_BT
 import kotlinx.android.synthetic.main.activity_main.*
+import azotzot.bluetoothmorsechat.Constants.Companion.CONNECT_FAIL
+import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_WRITE
+import java.nio.charset.Charset
+import azotzot.bluetoothmorsechat.Message as MyMessage
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,43 +31,45 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainHandler: MainHandler
     private lateinit var chatService: ChatService
 
-    private val messages =
-        mutableListOf(Messages("hello World!"), Messages("Here we go again"))
+    private val messages = mutableListOf<MyMessage>(MyMessage("debug","test"))
 
 
+    private lateinit var messagesAdapter: MessagesAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
-
-
-//        if (!bluetoothAdapter.isEnabled) {
-//            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
-//        }
+        if (!bluetoothAdapter.isEnabled) {
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+        }
         pairedDevices = bluetoothAdapter.bondedDevices.toMutableList()
         mainHandler = MainHandler()
 
         chatService = ChatService(this, mainHandler).apply { start() }
 
+        messagesAdapter = MessagesAdapter(messages, this@MainActivity)
+
         messagesList.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = MessagesAdapter(messages, this@MainActivity)
+            layoutManager = LinearLayoutManager(this@MainActivity).apply {
+                this.reverseLayout = true
+            }
+            adapter = messagesAdapter
         }
 
         sendButton.setOnClickListener {
             val message = editMessage.text.toString()
-//            if (message.isNotEmpty())
+            if (message.isNotEmpty())
                 send(message)
         }
     }
 
 
-    fun send(message: String) {
-        val message = "test"
-        val send = message.toByteArray()
+    private fun send(message: String) {
+//        val message = "test"
+        val send = message.toByteArray(Charsets.UTF_8)
         chatService.write(send)
         editMessage.text.clear()
         Toast.makeText(this, "Send: $message", Toast.LENGTH_SHORT).show()
@@ -95,14 +99,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-//        stopService(Intent(this, ChatService::class.java))
+        chatService.disconnect()
 
     }
 
     @SuppressLint("HandlerLeak")
     inner class MainHandler : Handler() {
-        private val TAG = "MainHandler"
+//        private val TAG = "MainHandler"
         override fun handleMessage(msg: Message?) {
             when (msg?.what) {
                 CHANGE_UI -> {
@@ -113,6 +116,30 @@ class MainActivity : AppCompatActivity() {
                 MESSAGE_TOAST -> {
                     Log.d(TAG, msg.data.getString("toast"))
                     Toast.makeText(this@MainActivity, msg.data.getString("toast"),Toast.LENGTH_SHORT).show()
+                }
+                MESSAGE_READ -> {
+//                    Log.d(TAG, msg.data.getString("toast"))
+                    val readBuf = msg.data.getByteArray("mmBuffer")
+                    // construct a string from the valid bytes in the buffer
+                    var readMessage: String = ""
+                    if (readBuf != null) {
+//                        readMessage = String(readBuf, 0, msg.arg1)
+                        readMessage = String(readBuf,0,msg.arg1)
+                    }
+                    messages.add(0,MyMessage(msg.data.getString("sender"),readMessage))
+                    messagesAdapter.notifyItemInserted(0)
+                    Toast.makeText(this@MainActivity, readMessage,Toast.LENGTH_SHORT).show()
+                }
+                MESSAGE_WRITE -> {
+                    val readBuf = msg.obj as ByteArray
+                    // construct a string from the valid bytes in the buffer
+                    val readMessage = String(readBuf)
+                    messages.add(0,MyMessage("Me",readMessage))
+                    messagesAdapter.notifyItemInserted(0)
+
+                }
+                CONNECT_FAIL -> {
+                    Toast.makeText(this@MainActivity, "Connect failed, check second device",Toast.LENGTH_SHORT).show()
                 }
             }
         }
