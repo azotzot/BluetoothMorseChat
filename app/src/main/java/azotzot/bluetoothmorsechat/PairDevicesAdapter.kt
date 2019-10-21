@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,19 +12,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import azotzot.bluetoothmorsechat.Constants.Companion.COMMAND_CONNECT
 import kotlinx.android.synthetic.main.devices_item.view.*
 
-class PairDevicesAdapter(private val pairedDevices: MutableList<BluetoothDevice>, private val context: Context, private val dialog: Dialog?) : RecyclerView.Adapter<PairDevicesAdapter.DevicesViewHolder>() {
-
-    init {
-        Log.d("Pair", "adapter create")
-    }
+class PairDevicesAdapter(private val pairedDevices: MutableList<BluetoothDevice>,
+                         private val context: Context,
+                         private val chatService: ChatService) : RecyclerView.Adapter<PairDevicesAdapter.DevicesViewHolder>() {
     private val TAG = "PairDevicesAdapter"
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DevicesViewHolder {
         Log.d(TAG, "onCreateViewHolder")
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.devices_item, parent, false)
-        return DevicesViewHolder(view, context, dialog)
+        return DevicesViewHolder(view, context)
     }
 
     override fun onBindViewHolder(holder: DevicesViewHolder, position: Int) {
@@ -34,14 +34,11 @@ class PairDevicesAdapter(private val pairedDevices: MutableList<BluetoothDevice>
 
     override fun getItemCount() = pairedDevices.size
 
-    class DevicesViewHolder(
+    inner class DevicesViewHolder(
         itemView: View,
-        context: Context,
-        private val dialog: Dialog?
+        context: Context
     ): RecyclerView.ViewHolder(itemView) {
         private val TAG = "DevicesViewHolder"
-
-        private val CCOMMAND_CONNECT = 0
 
         var deviceName: TextView = itemView.deviceName
         var deviceAddress: TextView = itemView.deviceAddress
@@ -56,10 +53,9 @@ class PairDevicesAdapter(private val pairedDevices: MutableList<BluetoothDevice>
                 }
                 Log.d(TAG, "Click position $pos")
 
-                dialog?.dismiss() /////СДЕЛАЬ ЧТОБ РАБОТАЛО
+                chatService.connect(pairedDevices[pos])
 
-                context.startService(Intent(context, ChatService::class.java).putExtra("command", CCOMMAND_CONNECT))
-
+//                dialog?.dismiss() /////СДЕЛАЬ ЧТОБ РАБОТАЛО
 
                 Toast.makeText( context, "Connecting...", Toast.LENGTH_SHORT).show()
 

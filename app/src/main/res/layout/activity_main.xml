@@ -9,29 +9,51 @@
     tools:context=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/messagesList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp" />
+        tools:layout_editor_absoluteY="1dp">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#815B5666"
         android:orientation="horizontal"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="538dp">
 
-        <EditText
-            android:id="@+id/editMessage"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:ems="10"
-            android:hint="@string/message_hint"
-            android:inputType="textLongMessage|textMultiLine|textPersonName"
-            android:paddingLeft="8dp"
-            android:importantForAutofill="no" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/morseString"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_back"
+                android:editable="true"
+                android:enabled="false"
+                android:hint="morse code"
+                android:paddingLeft="8dp"
+                android:textColor="#050000"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/editMessage"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:ems="10"
+                android:hint="@string/message_hint"
+                android:importantForAutofill="no"
+                android:inputType="textLongMessage|textMultiLine|textPersonName"
+                android:paddingLeft="8dp" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/sendButton"

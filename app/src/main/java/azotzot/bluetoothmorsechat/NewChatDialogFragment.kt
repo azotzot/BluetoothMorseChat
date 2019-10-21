@@ -2,7 +2,6 @@ package azotzot.bluetoothmorsechat
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.bluetooth.BluetoothDevice
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +11,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class NewChatDialogFragment(private val pairedDevices: MutableList<BluetoothDevice>) : DialogFragment() {
+class NewChatDialogFragment(private val pairDevicesAdapter: PairDevicesAdapter) : DialogFragment() {
 
     private val TAG = "NewChatDialogFragment"
 
@@ -22,7 +21,7 @@ class NewChatDialogFragment(private val pairedDevices: MutableList<BluetoothDevi
         savedInstanceState: Bundle?
     ): View? {
 
-        Log.d(TAG, "$pairedDevices")
+        Log.d(TAG, "$pairDevicesAdapter")
         return view
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -30,7 +29,7 @@ class NewChatDialogFragment(private val pairedDevices: MutableList<BluetoothDevi
         val rv = RecyclerView(requireContext())
         with(rv) {
             layoutManager = LinearLayoutManager(context)
-            adapter = PairDevicesAdapter(pairedDevices, context, dialog)
+            adapter = pairDevicesAdapter
             setHasFixedSize(true)
         }
 
