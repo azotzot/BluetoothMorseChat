@@ -8,30 +8,31 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import azotzot.bluetoothmorsechat.Constants.Companion.CHANGE_UI
 import azotzot.bluetoothmorsechat.Constants.Companion.CONNECT_FAIL
 import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_READ
 import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_TOAST
 import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_WRITE
+import azotzot.bluetoothmorsechat.Constants.Companion.SEND_FAILED
+import azotzot.bluetoothmorsechat.Constants.Companion.SEND_MESSAGE
+import azotzot.bluetoothmorsechat.Constants.Companion.SEND_SUCCESS
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
 
-class ChatService(private val context: Context, private val mainHandler: Handler) {
+class ChatService(private val context: Context,
+                  private val mainHandler: Handler,
+                  private val bluetoothAdapter: BluetoothAdapter) {
+
     private val TAG = "ChatService"
 
     private val APP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
     private val NAME_SECURE = "ChatService"
 
-//    private lateinit var serverSocket: BluetoothServerSocket?
-//    private lateinit var clientSocket: BluetoothSocket?
-
-    private lateinit var bluetoothAdapter: BluetoothAdapter
-
-//    private var mConnectThread: TestThread? = null
     private var mConnectThread: ConnectThread? = null
     private var mConnectedThread: ConnectedThread? = null
     private var mSecureAcceptThread: AcceptThread? = null
@@ -40,11 +41,12 @@ class ChatService(private val context: Context, private val mainHandler: Handler
     val STATE_LISTEN = 1
     val STATE_CONNECTING = 2
     val STATE_CONNECTED = 3
+
     private var mState = STATE_NONE
         @Synchronized get
 
     fun start() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+//        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     }
 
     @Synchronized fun connect(device: BluetoothDevice) {
@@ -93,14 +95,20 @@ class ChatService(private val context: Context, private val mainHandler: Handler
     fun write(msg: ByteArray) {
         val r: ConnectedThread?
         synchronized(this) {
-            if(mState != STATE_CONNECTED) return
+            if(mState != STATE_CONNECTED) {
+                mainHandler.obtainMessage(MESSAGE_TOAST, SEND_FAILED).sendToTarget()
+                return
+            }
             r = this.mConnectedThread!!
         }
         if (r != null) {
             if (r.isAlive) {
                 r.write(msg)
+                mainHandler.obtainMessage(MESSAGE_TOAST, SEND_SUCCESS).sendToTarget()
+                return
             }
         }
+        mainHandler.obtainMessage(MESSAGE_TOAST, SEND_FAILED).sendToTarget()
     }
 
     private inner class AcceptThread : Thread() {
