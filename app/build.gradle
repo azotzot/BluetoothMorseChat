@@ -6,6 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 28
+    project.archivesBaseName = "BluetoothMorseChat"
     defaultConfig {
         applicationId "azotzot.bluetoothmorsechat"
         minSdkVersion 25
@@ -18,6 +19,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
         }
     }
 }
