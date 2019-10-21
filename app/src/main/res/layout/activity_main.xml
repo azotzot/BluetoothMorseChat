@@ -11,7 +11,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp">
@@ -37,14 +37,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/border_back"
+                android:editable="true"
+                android:enabled="false"
+                android:hint="morse code"
                 android:paddingLeft="8dp"
-                android:text="morse code"
-                android:textSize="12sp" />
+                android:textColor="#050000"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/editMessage"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="40dp"
                 android:ems="10"
                 android:hint="@string/message_hint"
                 android:importantForAutofill="no"
