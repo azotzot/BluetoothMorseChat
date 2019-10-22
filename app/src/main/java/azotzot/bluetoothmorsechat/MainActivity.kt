@@ -11,27 +11,29 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.util.Log
-import android.view.*
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import azotzot.bluetoothmorsechat.Constants.Companion.CHANGE_TITLE
 import azotzot.bluetoothmorsechat.Constants.Companion.CHANGE_UI
-import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_READ
-import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_TOAST
-import azotzot.bluetoothmorsechat.Constants.Companion.REQUEST_ENABLE_BT
-import kotlinx.android.synthetic.main.activity_main.*
+import azotzot.bluetoothmorsechat.Constants.Companion.CLOSE_DIALOG_FRAGMENT
 import azotzot.bluetoothmorsechat.Constants.Companion.CONNECT_FAIL
 import azotzot.bluetoothmorsechat.Constants.Companion.ENTER_TYPE_PRESS
+import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_READ
+import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_TOAST
 import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_WRITE
+import azotzot.bluetoothmorsechat.Constants.Companion.REQUEST_ENABLE_BT
 import azotzot.bluetoothmorsechat.Constants.Companion.SEND_FAILED
 import azotzot.bluetoothmorsechat.Constants.Companion.SEND_SUCCESS
 import azotzot.bluetoothmorsechat.MorseDecoder.Companion.en
 import azotzot.bluetoothmorsechat.MorseDecoder.Companion.ru
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import azotzot.bluetoothmorsechat.Message as MyMessage
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
 class MainActivity : AppCompatActivity() {
@@ -45,13 +47,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var morseDecoder: MorseDecoder
 
     private lateinit var menu: Menu
+    private lateinit var chosenDialog: NewChatDialogFragment
 
     private var enterType = ENTER_TYPE_PRESS
 
     private val messages = mutableListOf<MyMessage>(MyMessage("debug", "test"))
-
-
     private lateinit var messagesAdapter: MessagesAdapter
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -206,12 +209,20 @@ class MainActivity : AppCompatActivity() {
                     R.id.connectTo -> {
 
                         val adapter = PairDevicesAdapter(pairedDevices, this, chatService)
-                        val chosenDialog = NewChatDialogFragment(adapter)
+                        chosenDialog = NewChatDialogFragment(adapter)
                         chosenDialog.show(supportFragmentManager, "newChatDialog")
                     }
                     R.id.listenConnect -> {
                         chatService.listenConnect()
                         Toast.makeText(this, "Wait connection...", Toast.LENGTH_SHORT).show()
+                    }
+                    R.id.showKeyboard -> {
+                        item.isChecked = !item.isChecked
+                        if (!item.isChecked)  {
+                            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+                        }
+                        editMessage.showSoftInputOnFocus = item.isChecked
                     }
 
                 }
@@ -228,9 +239,16 @@ class MainActivity : AppCompatActivity() {
             override fun handleMessage(msg: Message?) {
                 when (msg?.what) {
                     CHANGE_UI -> {
-                        val ttl = msg.obj as String
-                        Log.d(TAG, "Change Main Title to $ttl")
-                        title = ttl
+                        when(msg.arg1) {
+                            CLOSE_DIALOG_FRAGMENT -> chosenDialog.dismiss()
+                            CHANGE_TITLE -> {
+                                val ttl = msg.obj as String
+                                Log.d(TAG, "Change Main Title to $ttl")
+                                title = ttl
+                            }
+                        }
+
+
                     }
                     MESSAGE_TOAST -> {
                         when (msg.arg1) {
@@ -279,12 +297,12 @@ class MainActivity : AppCompatActivity() {
 
         override fun onStop() {
             super.onStop()
-            chatService.disconnect()
+//            chatService.disconnect()
         }
 
         override fun onDestroy() {
             super.onDestroy()
-//        chatService.disconnect()
+            chatService.disconnect()
 
         }
     }

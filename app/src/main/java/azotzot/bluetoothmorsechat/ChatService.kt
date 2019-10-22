@@ -9,7 +9,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.widget.Toast
+import azotzot.bluetoothmorsechat.Constants.Companion.CHANGE_TITLE
 import azotzot.bluetoothmorsechat.Constants.Companion.CHANGE_UI
+import azotzot.bluetoothmorsechat.Constants.Companion.CLOSE_DIALOG_FRAGMENT
 import azotzot.bluetoothmorsechat.Constants.Companion.CONNECT_FAIL
 import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_READ
 import azotzot.bluetoothmorsechat.Constants.Companion.MESSAGE_TOAST
@@ -56,7 +58,7 @@ class ChatService(private val context: Context,
         }
         mConnectThread = ConnectThread(device)
         mConnectThread!!.start()
-
+        mainHandler.obtainMessage(CHANGE_UI, CLOSE_DIALOG_FRAGMENT,-1).sendToTarget()
         mState = STATE_CONNECTING
 
     }
@@ -75,7 +77,7 @@ class ChatService(private val context: Context,
 
     private fun setUITitle(deviceName: String) {
         Log.d(TAG, "Change Main Title to $deviceName")
-        mainHandler.obtainMessage(CHANGE_UI,-1,-1, deviceName).sendToTarget()
+        mainHandler.obtainMessage(CHANGE_UI,CHANGE_TITLE,-1, deviceName).sendToTarget()
 
     }
 

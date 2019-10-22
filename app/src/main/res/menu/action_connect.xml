@@ -6,16 +6,21 @@
         android:id="@+id/connectTo"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="connect"
+        android:title="Connect"
         android:visible="true"
-        app:showAsAction="always"></item>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/listenConnect"
         android:enabled="true"
         android:icon="@android:drawable/stat_sys_data_bluetooth"
-        android:title="Connect listen"
+        android:title="Listen connect"
         android:visible="true"
-        app:showAsAction="ifRoom">
-    </item>
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/showKeyboard"
+        android:enabled="true"
+        android:checkable="true"
+        android:title="Show keyboard"
+        app:showAsAction="ifRoom" />
 </menu>
