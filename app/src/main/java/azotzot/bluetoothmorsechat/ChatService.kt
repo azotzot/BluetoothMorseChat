@@ -50,7 +50,7 @@ class ChatService(private val context: Context,
     fun start() {
 //        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     }
-
+//  Попытка подключения к удаленному устройству
     @Synchronized fun connect(device: BluetoothDevice) {
         if (mConnectThread != null) {
             mConnectThread!!.cancel()
@@ -62,7 +62,7 @@ class ChatService(private val context: Context,
         mState = STATE_CONNECTING
 
     }
-
+//  Активация ожидания подключения
     @Synchronized fun listenConnect() {
 //        mState = STATE_LISTEN
 //        if(serverSocket !=  null) {
@@ -74,13 +74,13 @@ class ChatService(private val context: Context,
         mState = STATE_CONNECTING
 
     }
-
+//  Смена названия в action bar на имя подключенного устройства
     private fun setUITitle(deviceName: String) {
         Log.d(TAG, "Change Main Title to $deviceName")
         mainHandler.obtainMessage(CHANGE_UI,CHANGE_TITLE,-1, deviceName).sendToTarget()
 
     }
-
+//  Включение менеджера сеанса подключения
     @Synchronized private fun connected(socket: BluetoothSocket) {
         if (mConnectedThread != null) {
             mConnectedThread!!.cancel()
@@ -93,7 +93,7 @@ class ChatService(private val context: Context,
         setUITitle(socket.remoteDevice.name)
 
     }
-
+//  Отправка сообщения
     fun write(msg: ByteArray) {
         val r: ConnectedThread?
         synchronized(this) {
@@ -112,7 +112,7 @@ class ChatService(private val context: Context,
         }
         mainHandler.obtainMessage(MESSAGE_TOAST, SEND_FAILED).sendToTarget()
     }
-
+//  Поток ожидания подключения
     private inner class AcceptThread : Thread() {
         private val serverSocket: BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
             bluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE, APP_UUID)
@@ -146,7 +146,7 @@ class ChatService(private val context: Context,
             }
         }
     }
-
+//  Поток попытки подключения
     private inner class ConnectThread(private val device: BluetoothDevice) : Thread() {
 
         private val clientSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
@@ -183,7 +183,7 @@ class ChatService(private val context: Context,
             }
         }
     }
-
+//  Поток менеджера подключения
     private inner class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
 
 //        private val TAG = "ConnectedThread"
@@ -214,7 +214,7 @@ class ChatService(private val context: Context,
                     break
                 }
 
-//                 Send the obtained bytes to the UI activity.
+
                 val readMsg = mainHandler.obtainMessage(MESSAGE_READ, numBytes,-1)
                 val bundle = Bundle().apply {
                     putString("sender", mmSocket.remoteDevice.name)
@@ -225,7 +225,7 @@ class ChatService(private val context: Context,
             }
         }
 
-        // Call this from the main activity to send data to the remote device.
+
         fun write(bytes: ByteArray) {
             Log.d(TAG, "message $bytes")
             try {
@@ -234,7 +234,7 @@ class ChatService(private val context: Context,
             } catch (e: IOException) {
                 Log.e(TAG, "Error occurred when sending data", e)
 
-                // Send a failure message back to the activity.
+
                 val writeErrorMsg = mainHandler.obtainMessage(MESSAGE_TOAST)
                 val bundle = Bundle().apply {
                     putString("toast", "Couldn't send data to the other device")
@@ -244,13 +244,13 @@ class ChatService(private val context: Context,
                 return
             }
 
-            // Share the sent message with the UI activity.
+
             val writtenMsg = mainHandler.obtainMessage(
                 MESSAGE_WRITE, -1, -1, bytes)
             writtenMsg.sendToTarget()
         }
 
-        // Call this method from the main activity to shut down the connection.
+
         fun cancel() {
             Log.d(TAG, "connected thread cancel")
             try {
