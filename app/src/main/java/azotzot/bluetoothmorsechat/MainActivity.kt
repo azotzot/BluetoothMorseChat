@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
         chatService = ChatService(this, mainHandler, bluetoothAdapter).apply { start() }
     }
-
+//Receiver событий блютуз
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent?.action
@@ -119,14 +119,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
+//      Функция отправки сообщений
         private fun send(message: String) {
 //        val message = "test"
             val send = message.toByteArray(Charsets.UTF_8)
             chatService.write(send)
             editMessage.text.clear()
         }
-
+//      Функция декодирования морзянки
         fun morseDecode() {
             val text = morseString.text.toString()
             val decoded = morseDecoder.decodeChar(text.substring(0, text.length - 1))
@@ -138,14 +138,13 @@ class MainActivity : AppCompatActivity() {
             morseString.editableText.clear()
 //        Toast.makeText(this, "new letter", Toast.LENGTH_SHORT).show()
         }
-
+//      Функция добавления пробела
         fun space() {
-//        morseDecode()
             editMessage.append(" ")
             morseString.editableText.clear()
 //        Toast.makeText(this, "space enter", Toast.LENGTH_SHORT).show()
         }
-
+//      Обработчик событий нажатия аппаратных кнопок
         override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
 
             when (event?.keyCode) {
